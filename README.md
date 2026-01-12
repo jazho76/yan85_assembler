@@ -2,20 +2,11 @@
 
 **yan85** is a small, intentionally constrained virtual machine architecture commonly encountered in reverse-engineering and exploitation challenges.
 
-It is designed to be:
-
-- simple to implement,
-- awkward to program,
-- and interesting to reverse.
+It is designed to be simple to implement, awkward to program, and interesting to reverse.
 
 The architecture uses a fixed-width instruction format, a minimal register set, and a compact instruction set that exposes low-level execution details such as explicit stack manipulation, flag-based control flow, and a syscall interface.
 
-yan85 is not intended to model a real CPU. Instead, it serves as a pedagogical and challenge-oriented VM that forces close interaction with:
-
-- instruction encoding,
-- control-flow mechanics,
-- memory access patterns,
-- and VM-specific quirks.
+yan85 is not intended to model a real CPU. Instead, it serves as a pedagogical and challenge-oriented VM that forces close interaction with instruction encoding, control-flow mechanics, memory access patterns and VM-specific quirks.
 
 Because of this, yan85 frequently appears in CTFs and exploit-development exercises, where tooling such as custom assemblers, disassemblers, and emulators is often required.
 
