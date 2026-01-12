@@ -1,0 +1,148 @@
+#!/usr/bin/env python3
+
+import sys
+from vm_settings import VmSettings, Instruction
+
+class Yan85Disassembler:
+    def __init__(self, settings: VmSettings):
+        self._insrtuctions = []
+        self._settings = settings
+
+    def load(self, filename):
+        data = b""
+        with open(filename, "rb") as f:
+            data = f.read()
+
+        assert len(data) % 3 == 0
+        inst_num = 0
+
+        for i in range(0, len(data), 3):
+            inst = self._settings.inst_reader(data[i : i + 3])
+            self._insrtuctions.append(inst)
+            self._dec(inst_num, inst)
+            inst_num += 1
+
+    def _dec(self, i, inst: Instruction):
+        inst_disasm = [
+            self._disasm_imm,
+            self._disasm_stk,
+            self._disasm_stm,
+            self._disasm_ldm,
+            self._disasm_cmp,
+            self._disasm_jmp,
+            self._disasm_add,
+            self._disasm_sys,
+        ]
+
+        for disasm in inst_disasm:
+            t = disasm(inst)
+            if t:
+                self._print_inst(i, inst, t)
+                return
+
+        self._print_inst(i, inst, "???")
+
+    def _print_inst(self, i, inst, text):
+        print(
+            f"  {i:02x}:       {inst.op:02x} {inst.arg1:02x} {inst.arg2:02x}    {text}"
+        )
+
+    def _disasm_imm(self, i):
+        if i.op != self._settings.opcode_imm:
+            return None
+        return f"imm\t{self._dec_reg(i.arg1)} {hex(i.arg2)}"
+
+    def _disasm_stk(self, i):
+        if i.op != self._settings.opcode_stk:
+            return None
+        return f"stk\t{self._dec_reg(i.arg1)} {self._dec_reg(i.arg2)}"
+
+    def _disasm_stm(self, i):
+        if i.op != self._settings.opcode_stm:
+            return None
+        return f"stm\t{self._dec_reg(i.arg1)} {self._dec_reg(i.arg2)}"
+
+    def _disasm_ldm(self, i):
+        if i.op != self._settings.opcode_ldm:
+            return None
+        return f"ldm\t{self._dec_reg(i.arg1)} {self._dec_reg(i.arg2)}"
+
+    def _disasm_cmp(self, i):
+        if i.op != self._settings.opcode_cmp:
+            return None
+        return f"cmp\t{self._dec_reg(i.arg1)} {self._dec_reg(i.arg2)}"
+
+    def _disasm_jmp(self, i):
+        if i.op != self._settings.opcode_jmp:
+            return None
+        return f"jmp\t{self._dec_jmp_type(i.arg1)} {self._dec_reg(i.arg2)}"
+
+    def _disasm_add(self, i):
+        if i.op != self._settings.opcode_add:
+            return None
+        return f"add\t{self._dec_reg(i.arg1)} {self._dec_reg(i.arg2)}"
+
+    def _disasm_sys(self, i):
+        if i.op != self._settings.opcode_sys:
+            return None
+        return (
+            f"sys\t{self._dec_syscalls(i.arg1)} {self._dec_reg(i.arg2)}"
+        )
+
+    def _dec_reg(self, reg):
+        if reg == 0x0:
+            return "none"
+        if reg == self._settings.reg_a:
+            return "a"
+        if reg == self._settings.reg_b:
+            return "b"
+        if reg == self._settings.reg_c:
+            return "c"
+        if reg == self._settings.reg_d:
+            return "d"
+        if reg == self._settings.reg_f:
+            return "f"
+        if reg == self._settings.reg_i:
+            return "i"
+        if reg == self._settings.reg_s:
+            return "s"
+        return f"unk_reg({hex(reg)})"
+
+    def _dec_syscalls(self, syscall):
+        syscall_dict = {
+            self._settings.syscall_open: "op",
+            self._settings.syscall_read_mem: "rm",
+            self._settings.syscall_read_code: "rc",
+            self._settings.syscall_write: "wr",
+            self._settings.syscall_sleep: "sl",
+            self._settings.syscall_exit: "ex",
+        }
+        return syscall_dict[syscall] or '??'
+
+    def _dec_jmp_type(self, cond):
+        if cond == 0:
+            return "al"
+        if cond & self._settings.jmp_cond_eq:
+            return "eq"
+        if (cond & self._settings.jmp_cond_lt) and (cond & self._settings.jmp_cond_gt):
+            return "ne"
+        if cond & self._settings.jmp_cond_lt:
+            return "lt"
+        if cond & self._settings.jmp_cond_gt:
+            return "gt"
+        if cond & self._settings.jmp_cond_z:
+            return "z"
+        if cond & self._settings.jmp_cond_nz:
+            return "nz"
+        return "??"
+
+
+if __name__ == "__main__":
+    settings = VmSettings()
+    disassembler = Yan85Disassembler(settings)
+
+    if len(sys.argv) != 2:
+        print("Usage: disasm <bin file>")
+        sys.exit(1)
+
+    disassembler.load(sys.argv[1])
