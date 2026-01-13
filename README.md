@@ -182,21 +182,10 @@ jmp ne b
 
 Invoke a system call.
 
-The specific operation is selected by `<call>`. The register operand is used as the syscall argument or handle, depending on the call.
+The specific operation is selected by `<call>`. The register operand is used to store the result of the syscall.
 
 - `<call>`: syscall selector
-- `<reg>`: register used by the syscall
-
-Supported syscalls:
-
-| Syscall | Description |
-| ------- | ----------- |
-| `op`    | Open        |
-| `rm`    | Read memory |
-| `rc`    | Read code   |
-| `wr`    | Write       |
-| `sl`    | Sleep       |
-| `ex`    | Exit        |
+- `<reg>`: register to store syscall result
 
 Example:
 
@@ -204,3 +193,14 @@ Example:
 sys op a
 sys wr a
 ```
+
+### Syscalls
+
+| Syscall | Description | reg_a      | reg_b    | reg_c   | Result          |
+| ------- | ----------- | ---------- | -------- | ------- | --------------- |
+| `op`    | Open        | `pathname` | `flags`  | `mode`  | `fd`            |
+| `rm`    | Read Memory | `fd`       | `buffer` | `count` | `read bytes`    |
+| `rc`    | Read Code   | `fd`       | `buffer` | `count` | `read bytes`    |
+| `wr`    | Write       | `fd`       | `buffer` | `count` | `written bytes` |
+| `sl`    | Sleep       | `seconds`  | —        | —       | —               |
+| `ex`    | Exit        | `status`   | —        | —       | —               |
