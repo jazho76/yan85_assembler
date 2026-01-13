@@ -1,39 +1,31 @@
-; write "/flag" to 0x30
-imm a 0x30
-imm b '/'
-imm c 1
-stm a b
-add a c
-imm b 'f'
-stm a b
-add a c
-imm b 'l'
-stm a b
-add a c
-imm b 'a'
-stm a b
-add a c
-imm b 'g'
-stm a b
-add a c
-imm b 0x0
-stm a b
+; Loop from 0 to 3, sleep 1 second between counts,
+; use the stack to store the counter, then exit.
 
-; open file 
-imm a 0x30
-imm b 0x0
-sys op a
+start:
+    imm a 0          ; counter = 0
+    stk a none       ; push counter
+    imm b 3          ; limit = 3
 
-; read mem
-imm b 0x40
-imm c 100
-sys rm c
+loop:
+    ; sleep(1)
+    imm c 1
+    sys sl c
 
-; write
-imm a 1
-imm b 0x40
-sys wr a
+    ; pop counter into a
+    stk none a
 
-; exit
-imm a 0
-sys ex a
+    ; a = a + 1
+    imm c 1
+    add a c
+
+    ; push updated counter
+    stk a none
+
+    ; if a < limit, continue looping
+    cmp a b
+    imm d loop
+    jmp lt d
+
+    ; exit(0)
+    imm a 0
+    sys ex a
