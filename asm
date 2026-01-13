@@ -3,30 +3,40 @@
 import sys
 from vm_settings import VmSettings, Instruction
 
+
 class Yan85Assembler:
     def __init__(self, settings: VmSettings):
         self._settings = settings
         self._labels = {}
 
-    def assemble(self, src_filename, out_filename):
+    def asm_from_file(self, src_filename, out_filename):
+        src = ""
+        with open(src_filename, "r") as f:
+            src = f.read()
+
+        bin = self.asm_from_src(src)
+
+        with open(out_filename, "wb") as f:
+            f.write(bin)
+
+    def asm_from_src(self, src_text):
         ln = 1
         lines = []
         instructions = []
-        self._labels =  {}
+        self._labels = {}
 
-        with open(src_filename, "r") as f:
-            for line in f:
-                inst_src = line.strip()
-                if ";" in inst_src:
-                    inst_src = inst_src.split(";")[0].strip()
-                words = inst_src.split()
-                if len(words) == 1 and words[0].endswith(":"):
-                    label = words[0][:-1]
-                    if label in self._labels:
-                        self._stop(f"Duplicate label: {label}", ln)
-                    self._labels[label] = ln
-                lines.append(words)
-                ln = ln + 1
+        for line in src_text.splitlines():
+            inst_src = line.strip()
+            if ";" in inst_src:
+                inst_src = inst_src.split(";")[0].strip()
+            words = inst_src.split()
+            if len(words) == 1 and words[0].endswith(":"):
+                label = words[0][:-1]
+                if label in self._labels:
+                    self._stop(f"Duplicate label: {label}", ln)
+                self._labels[label] = ln
+            lines.append(words)
+            ln = ln + 1
 
         ln = 1
         for words in lines:
@@ -43,10 +53,11 @@ class Yan85Assembler:
             instructions.append(inst)
             ln = ln + 1
 
-        with open(out_filename, "wb") as f:
-            for inst in instructions:
-                f.write(self._settings.inst_writer(inst))
+        bin = b""
+        for inst in instructions:
+            bin += inst.pack()
 
+        return bin
     def _asm(self, words, ln):
         inst_assemblers = [
             self._asm_imm,
@@ -62,7 +73,9 @@ class Yan85Assembler:
         for asm in inst_assemblers:
             t = asm(words, ln)
             if t:
-                return Instruction(t[0], t[1], t[2])
+                inst = Instruction()
+                inst.from_values(t[0], t[1], t[2])
+                return inst
 
         self._stop(f"Invalid instruction {' '.join(words)}", ln)
 
@@ -246,6 +259,7 @@ class Yan85Assembler:
         print(f"Error at line {ln}: {msg}")
         exit(1)
 
+
 if __name__ == "__main__":
     settings = VmSettings()
     assembler = Yan85Assembler(settings)
@@ -254,4 +268,4 @@ if __name__ == "__main__":
         print("Usage: assemble <source file> <output file>")
         sys.exit(1)
 
-    assembler.assemble(sys.argv[1], sys.argv[2])
+    assembler.asm_from_file(sys.argv[1], sys.argv[2])

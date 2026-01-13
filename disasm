@@ -3,6 +3,7 @@
 import sys
 from vm_settings import VmSettings, Instruction
 
+
 class Yan85Disassembler:
     def __init__(self, settings: VmSettings):
         self._insrtuctions = []
@@ -17,7 +18,8 @@ class Yan85Disassembler:
         inst_num = 0
 
         for i in range(0, len(data), 3):
-            inst = self._settings.inst_reader(data[i : i + 3])
+            inst = Instruction()
+            inst.unpack(data[i : i + 3])
             self._insrtuctions.append(inst)
             self._dec(inst_num, inst)
             inst_num += 1
