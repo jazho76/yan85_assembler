@@ -157,13 +157,15 @@ If the condition evaluates to true, execution continues at the address stored in
 
 Supported conditions:
 
-- `al` — always
-- `eq` — equal
-- `ne` — not equal
-- `lt` — less than
-- `gt` — greater than
-- `z` — zero
-- `nz` — not zero
+| Condition | Description  |
+| --------- | ------------ |
+| `al`      | Always       |
+| `eq`      | Equal        |
+| `ne`      | Not equal    |
+| `lt`      | Less than    |
+| `gt`      | Greater than |
+| `z`       | Zero         |
+| `nz`      | Not zero     |
 
 Example:
 
