@@ -194,7 +194,6 @@ sys wr a
 | ------- | ----------- | ---------- | -------- | ------- | --------------- |
 | `op`    | Open        | `pathname` | `flags`  | `mode`  | `fd`            |
 | `rm`    | Read Memory | `fd`       | `buffer` | `count` | `read bytes`    |
-| `rc`    | Read Code   | `fd`       | `buffer` | `count` | `read bytes`    |
 | `wr`    | Write       | `fd`       | `buffer` | `count` | `written bytes` |
 | `sl`    | Sleep       | `seconds`  | —        | —       | —               |
 | `ex`    | Exit        | `status`   | —        | —       | —               |
