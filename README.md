@@ -1,14 +1,8 @@
 # Yan85 Assembler & Disassembler
 
-**yan85** is a small, intentionally constrained virtual machine architecture encountered in reverse-engineering and binary exploitation challenges.
+**yan85** is a small, intentionally constrained virtual machine architecture encountered in reverse-engineering and binary exploitation challenges. The architecture uses a fixed-width instruction format, a minimal register set, and a compact instruction set.
 
-It is designed to be simple to implement, awkward to program, and interesting to reverse.
-
-The architecture uses a fixed-width instruction format, a minimal register set, and a compact instruction set that exposes low-level execution details such as explicit stack manipulation, flag-based control flow and a syscall interface.
-
-yan85 is not intended to model a real CPU. Instead, it serves as a pedagogical and challenge-oriented VM.
-
-This repository provides a minimal assembler and disassembler to make working with yan85 programs practical while preserving the low-level nature of the VM.
+This repository provides a minimal assembler and disassembler to work with yan85.
 
 ## Overview
 
@@ -32,7 +26,7 @@ This repository provides:
 
 ## Registers
 
-The Yan85 VM exposes a small, fixed set of registers.  
+The yan85 VM exposes a small, fixed set of registers.  
 They are referenced symbolically in assembly and have predefined roles in the execution model.
 
 | Register | Type    | Purpose                                              |
