@@ -1,14 +1,12 @@
 # Yan85 Assembler & Disassembler
 
-**yan85** is a small, intentionally constrained virtual machine architecture commonly encountered in reverse-engineering and exploitation challenges.
+**yan85** is a small, intentionally constrained virtual machine architecture encountered in reverse-engineering and binary exploitation challenges.
 
 It is designed to be simple to implement, awkward to program, and interesting to reverse.
 
-The architecture uses a fixed-width instruction format, a minimal register set, and a compact instruction set that exposes low-level execution details such as explicit stack manipulation, flag-based control flow, and a syscall interface.
+The architecture uses a fixed-width instruction format, a minimal register set, and a compact instruction set that exposes low-level execution details such as explicit stack manipulation, flag-based control flow and a syscall interface.
 
-yan85 is not intended to model a real CPU. Instead, it serves as a pedagogical and challenge-oriented VM that forces close interaction with instruction encoding, control-flow mechanics, memory access patterns and VM-specific quirks.
-
-Because of this, yan85 frequently appears in CTFs and exploit-development exercises, where tooling such as custom assemblers, disassemblers, and emulators is often required.
+yan85 is not intended to model a real CPU. Instead, it serves as a pedagogical and challenge-oriented VM.
 
 This repository provides a minimal assembler and disassembler to make working with yan85 programs practical while preserving the low-level nature of the VM.
 
@@ -34,25 +32,18 @@ This repository provides:
 
 ## Registers
 
-The yan85 virtual machine exposes a small, fixed set of registers.  
+The Yan85 VM exposes a small, fixed set of registers.  
 They are referenced symbolically in assembly and have predefined roles in the execution model.
 
-### General-purpose registers
-
-- **`a`**, **`b`**, **`c`**, **`d`**  
-  General-purpose registers used for arithmetic, data movement, comparisons, and syscall arguments.
-
-### Special registers
-
-- **`s`** — **Stack register**  
-  Used implicitly by stack-related operations. Tracks the current stack position.
-
-- **`f`** — **Flags register**  
-  Holds the result flags produced by comparison operations.  
-  Jump instructions evaluate their conditions based on this register.
-
-- **`i`** — **Instruction register**  
-  Used as the instruction pointer for control-flow operations such as jumps.
+| Register | Type    | Purpose                                              |
+| -------- | ------- | ---------------------------------------------------- |
+| `a`      | General | Arithmetic, data movement, comparisons, syscall args |
+| `b`      | General | Arithmetic, data movement, comparisons, syscall args |
+| `c`      | General | Arithmetic, data movement, comparisons, syscall args |
+| `d`      | General | Arithmetic, data movement, comparisons, syscall args |
+| `s`      | Special | Stack pointer for stack operations                   |
+| `f`      | Special | Flags from comparisons, used by jumps                |
+| `i`      | Special | Instruction pointer for control flow                 |
 
 ## Labels
 
@@ -75,8 +66,7 @@ imm a 0x41  ; Load ASCII 'A' into register a
 
 ## Instruction Set
 
-The yan85 instruction set is small and orthogonal.  
-All instructions operate on registers and follow a fixed-width encoding.
+The yan85 instruction set is small and orthogonal.
 
 ### `imm <dst> <value|label>`
 
@@ -112,7 +102,7 @@ Perform a stack operation.
 
 At least one operand must be a register. The instruction behaves as a push or pop depending on which operand is `none`.
 
-- `<reg|none>`: source or destination register, or `none`
+- `<reg|none>`: source/destination register or `none`
 
 Example:
 
@@ -199,15 +189,18 @@ The specific operation is selected by `<call>`. The register operand is used as 
 
 Supported syscalls:
 
-- `op` — open
-- `rm` — read memory
-- `rc` — read code
-- `wr` — write
-- `sl` — sleep
-- `ex` — exit
+| Syscall | Description |
+| ------- | ----------- |
+| `op`    | Open        |
+| `rm`    | Read memory |
+| `rc`    | Read code   |
+| `wr`    | Write       |
+| `sl`    | Sleep       |
+| `ex`    | Exit        |
 
 Example:
 
 ```asm
+sys op a
 sys wr a
 ```
